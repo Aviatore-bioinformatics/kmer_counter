@@ -15,6 +15,7 @@ def progress_bar(current_value, final_value):
     if not current_value % offset:
         print(f'\r\033[0K{current_value} / {final_value} ({diff:.2f}%)', end='', flush=True)
 
+
 chrom_len = {
     "chr1": 51465340,
     "chr2": 43913520,

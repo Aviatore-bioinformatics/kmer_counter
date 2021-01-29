@@ -1,82 +1,216 @@
-import subprocess
+# Multitasking using Pool and map
+
 import os
-from app.text_formating import warning, ok
+from intervaltree import Interval, IntervalTree
+import time
+from multiprocessing import Pool
+import copy
 
 
-def check(result):
-    try:
-        result.check_returncode()
-        print(ok('ok'))
-    except subprocess.CalledProcessError:
-        print(warning('fail'))
+class Timer:
+    def __init__(self):
+        self.start = None
+        self.stop = None
+    
+    def startt(self):
+        self.start = time.time()
 
-        print('Something went wrong during k-mer counting.')
-        print('Please, check the stderr output:\n')
-        print(result.stderr)
-
-        return False
-
-    return True
+    def stopp(self):
+        self.stop = time.time()
+        print("\n", self.stop - self.start, "sek")
 
 
-def kmer_counting(fasta_file, jellyfish_file, parameters):
-    print('')
-    print(f'Counting k-mers in the {fasta_file} file ... ', end='', flush=True)
+def my_find(str1, str2):
+    start = 0
+    end = len(str1)
+    all_finds = []
+    while str1.find(str2, start, end) != -1:
+        x = str1.find(str2, start, end)
+        all_finds.append(str(x))
+        start = x+1
 
-    result = subprocess.run(['jellyfish', 'count',
-                             '-m', parameters['kmer_length'],
-                             '-s', parameters['hash_size'],
-                             '-t', parameters['threads_number'],
-                             '-C', fasta_file,
-                             '-o', jellyfish_file], capture_output=True, text=True)
-
-    return check(result)
+    return all_finds
 
 
-def dump_jf_file(output_file_full_path, jellyfish_file_full_path, jellyfish_file, output_file_name):
-    print(f'Outputting counts from the {jellyfish_file} file to the {output_file_name} file ... ', end='', flush=True)
+data_inputs = [
+    {
+        "dump_file": "chr1_dump.fasta",
+        "chr_file": "chr1_oneLine_fasta.txt",
+        "chr_name": "chr1",
+        "output_file": "table_chr1"
+    },
+    {
+        "dump_file": "chr2_dump.fasta",
+        "chr_file": "chr2_oneLine_fasta.txt",
+        "chr_name": "chr2",
+        "output_file": "table_chr2"
+    },
+    {
+        "dump_file": "chr3_dump.fasta",
+        "chr_file": "chr3_oneLine_fasta.txt",
+        "chr_name": "chr3",
+        "output_file": "table_chr3"
+    },
+    {
+        "dump_file": "chr4_dump.fasta",
+        "chr_file": "chr4_oneLine_fasta.txt",
+        "chr_name": "chr4",
+        "output_file": "table_chr4"
+    },
+    {
+        "dump_file": "chr5_dump.fasta",
+        "chr_file": "chr5_oneLine_fasta.txt",
+        "chr_name": "chr5",
+        "output_file": "table_chr5"
+    },
+    {
+        "dump_file": "chr6_dump.fasta",
+        "chr_file": "chr6_oneLine_fasta.txt",
+        "chr_name": "chr6",
+        "output_file": "table_chr6"
+    },
+    {
+        "dump_file": "chr7_dump.fasta",
+        "chr_file": "chr7_oneLine_fasta.txt",
+        "chr_name": "chr7",
+        "output_file": "table_chr7"
+    },
+    {
+        "dump_file": "chr8_dump.fasta",
+        "chr_file": "chr8_oneLine_fasta.txt",
+        "chr_name": "chr8",
+        "output_file": "table_chr8"
+    },
+    {
+        "dump_file": "chr9_dump.fasta",
+        "chr_file": "chr9_oneLine_fasta.txt",
+        "chr_name": "chr9",
+        "output_file": "table_chr9"
+    },
+]
+max_thread_No = 4
 
-    result = subprocess.run(['jellyfish', 'dump', jellyfish_file_full_path,
-                             '-o', output_file_full_path], capture_output=True, text=True)
 
-    return check(result)
-
-
-def remove_jf_file(jellyfish_file, parameters):
-    if parameters['keep_intermediate_jf_files'] == 'no':
-        print(f'Deleting the {jellyfish_file} file ... ', end='', flush=True)
-
-        try:
-            os.remove(jellyfish_file)
-            print(ok('ok'))
-        except FileNotFoundError:
-            print(warning('fail'))
-            print(f'The {jellyfish_file} file was not found.')
+def worker_controller(q):
+    while True:
+        input = q.get()
+        if input is None:
+            break
+        worker(input)
+        q.task_done()
 
 
-def jellyfish(parameters):
-    print('Start k-mer counting using jellyfish.')
+def worker(data_input):
+    print("Loading '{}' file ...".format(data_input["dump_file"]))
+    data_kmer = {}
+    name_tmp = ""
+    with open(data_input["dump_file"], 'r') as file:
+        cont = True
+        while cont:
+            line = file.readline()
+            if line == '':
+                cont = False
+                break
+            line = line.rstrip()
+            if line[0] == ">":
+                name_tmp = line[1:]
+            else:
+                data_kmer[line] = name_tmp
+    
+    print("Loading '{}' file ...".format( data_input["chr_file"] ))
+    with open(data_input["chr_file"], 'r') as f:
+        chromosome = f.read()
+    
+    #----------------------------------------#
+    print("Loading 'MITEs.bed' file ...")
+    data_mites = []
+    with open("MITEs.bed", 'r') as f:
+        while True:
+            line = f.readline()
+            if line == '':
+                break
+            line = line.rstrip()
+            data_mites.append(line.split("\t"))
+    #----------------------------------------#
 
-    for file_prefix in parameters['prefixes']:
-        fasta_file = f'{file_prefix}.fasta'
-        fasta_file_full_path = os.path.join(parameters['data_dir'], fasta_file)
+    if os.path.exists( data_input["output_file"] ):
+        print("The file '{}' exists. Removing ...".format(data_input["output_file"]))
+        os.remove(data_input["output_file"])
 
-        jellyfish_file = f'{file_prefix}.jf'
-        jellyfish_file_full_path = os.path.join(parameters['jellyfish_out_dir'], jellyfish_file)
+    output = open(data_input["output_file"], 'a+')
 
-        output_file = f'{file_prefix}_dump.fasta'
-        output_file_full_path = os.path.join(parameters['jellyfish_out_dir'], output_file)
+    output_data_template = {}
+    output_data_template["edge"] = 0
+    output_data_template["genome"] = 0
+    mite_names = []
 
-        if os.path.exists(output_file_full_path):
-            print(f'The output {output_file} file already exists. Skipping ...')
-            continue
+    t = IntervalTree()
+    for mite in data_mites:
+        if mite[3] not in output_data_template.keys():
+            output_data_template[mite[3]] = 0
+            output_data_template[mite[3] + "_edge"] = 0
+            mite_names.append(mite[3])
+            mite_names.append(mite[3] + "_edge")
+        if mite[0] == data_input["chr_name"]:
+            t[int(mite[1]) - 0:int(mite[2])] = mite[3]
+    mite_names = set(mite_names)
 
-        if not kmer_counting(fasta_file_full_path, jellyfish_file_full_path, parameters):
-            return False
+    output.write("\t".join(["k-mer", "total_occurences_in_{}".format(data_input["chr_name"]), "\t".join(sorted(mite_names)), "edge", "genome"]))
+    output.write("\n")
 
-        if not dump_jf_file(output_file_full_path, jellyfish_file_full_path, jellyfish_file, output_file):
-            return False
+    ttt = Timer()
+    print("Started analysis ...")
+    log = open(time.strftime('%y-%m-%d_%H-%M_') + data_input["chr_name"] + "_log.txt", 'a+')
+    log.write("Analysis started at " + time.ctime() + "\n")
+    log.flush()
+    ttt.startt()
+    kmer_No = 0
+    for kmer in data_kmer.keys():
 
-        remove_jf_file(jellyfish_file_full_path, parameters)
+        output_data = copy.deepcopy(output_data_template)
 
-    return True
+        kmer_occurences = my_find(chromosome, kmer)
+
+        for kmer_occurence in kmer_occurences:
+            kmer_occurence = int(kmer_occurence)
+            result = t[kmer_occurence + 1:kmer_occurence + 11]
+            if result:
+                if len( list(result) ) > 2:
+                    print("\nThe interval tree length is higher than 2:", len( list(result) ), data_input["chr_name"])
+                    log.write("\t".join(["intTree>2", kmer, str(kmer_occurence), mite_name]) + "\n")
+                    log.flush()
+                    log.close()
+                    exit(1)
+                elif len( list(result) ) > 1:
+                    print("\nThe interval tree length is higher than 1.", data_input["chr_name"])
+                    log.write("\t".join(["1<intTree<2", kmer, str(kmer_occurence), str(list(result))]) + "\n")
+                    log.flush()
+
+                    for interval in result:
+                        output_data["edge"] += 1
+                        output_data[interval.data + "_edge"] += 1
+                else:
+                    result_parsed = list(result)[0]
+                    if (kmer_occurence) >= (result_parsed.begin - 1) and \
+                        (kmer_occurence + 10) <= result_parsed.end:
+                        output_data[result_parsed.data] += 1
+                    else:
+                        output_data["edge"] += 1
+                        output_data[result_parsed.data + "_edge"] += 1
+            else:
+                output_data["genome"] += 1
+
+        kmer_No += 1
+
+        output.write("\t".join([kmer, str(len(kmer_occurences))]))
+        for mite_name in sorted(mite_names):
+            output.write("\t" + str(output_data[mite_name]))
+        output.write("\t" + str(output_data["edge"]))
+        output.write("\t" + str(output_data["genome"]))
+        output.write("\n")
+    log.close()
+    output.close()
+    ttt.stopp()
+
+p = Pool(max_thread_No)
+p.map(worker, data_inputs)
