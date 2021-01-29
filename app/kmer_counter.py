@@ -5,6 +5,7 @@ from intervaltree import Interval, IntervalTree
 import time
 from multiprocessing import Pool
 import copy
+import pandas as pd
 
 
 class Timer:
