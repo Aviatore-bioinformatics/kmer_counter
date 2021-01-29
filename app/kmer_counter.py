@@ -33,7 +33,7 @@ def kmer_counting(fasta_file, jellyfish_file, parameters):
     return check(result)
 
 
-def dump_jf_file(output_file_full_path, jellyfish_file_full_path):
+def dump_jf_file(output_file_full_path, jellyfish_file_full_path, jellyfish_file, output_file_name):
     print(f'Outputting counts from the {jellyfish_file} file to the {output_file_name} file ... ', end='', flush=True)
 
     result = subprocess.run(['jellyfish', 'dump', jellyfish_file_full_path,
@@ -59,7 +59,7 @@ def jellyfish(parameters):
 
     for file_prefix in parameters['prefixes']:
         fasta_file = f'{file_prefix}.fasta'
-        fasta_file_full_path = os.path.join(parameters['jellyfish_out_dir'], fasta_file)
+        fasta_file_full_path = os.path.join(parameters['data_dir'], fasta_file)
 
         jellyfish_file = f'{file_prefix}.jf'
         jellyfish_file_full_path = os.path.join(parameters['jellyfish_out_dir'], jellyfish_file)
@@ -74,7 +74,7 @@ def jellyfish(parameters):
         if not kmer_counting(fasta_file_full_path, jellyfish_file_full_path, parameters):
             return False
 
-        if not dump_jf_file(output_file_full_path, jellyfish_file):
+        if not dump_jf_file(output_file_full_path, jellyfish_file_full_path, jellyfish_file, output_file):
             return False
 
         remove_jf_file(jellyfish_file_full_path, parameters)

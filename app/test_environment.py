@@ -29,7 +29,13 @@ def read_config(config_file):
                 value = value.split(',')
             parameters[key] = value
 
+    if not os.path.exists(parameters["output_dir"]):
+        os.mkdir(parameters["output_dir"])
+
     parameters['jellyfish_out_dir'] = os.path.join(parameters["output_dir"], JELLYFISH_OUT_DIR)
+
+    if not os.path.exists(parameters['jellyfish_out_dir']):
+        os.mkdir(parameters['jellyfish_out_dir'])
 
     return parameters
 
