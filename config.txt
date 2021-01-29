@@ -6,14 +6,14 @@ keep_intermediate_jf_files=no
 
 # FASTA files prefixes (comma-separated)
 # Prefixes must be equal to chromosomes' names
-prefixes=chr1
+prefixes=chr1-500,chr1-502
 output_dir=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/output
 data_dir=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data
 
 # k-mer frequency threshold
 # k-mers which frequency in MITEs is higher than the threshold will be considered for analysis
-kmer_thresh_min=15
-kmer_thresh_max=20
+kmer_thresh_min=
+kmer_thresh_max=
 
 # Normalization value used for preventing too small values during normalization of k-mer contribution
 # in genome

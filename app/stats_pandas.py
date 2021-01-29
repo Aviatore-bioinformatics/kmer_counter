@@ -12,7 +12,7 @@ class Stat:
         self.parameters = parameters
         self.BONFERRONI_OUT_INDEX = 1
         self.chrom_len = {}
-        self.total_chrom_len = 0
+        self.total_genome_len = 0
         self.mite_total_len = {}
         self.index = []
         self.mite_names = {}
@@ -49,6 +49,7 @@ class Stat:
         self.mite_total_len_calc()
         self.analyse()
         self.save_stats_to_file(self.stats_filtration())
+        self.save_stats_to_file(self.data)
 
     def chrom_len_calc(self):
         for prefix in self.parameters['prefixes']:
@@ -60,7 +61,7 @@ class Stat:
                     line_len += len(line)
 
                 self.chrom_len[prefix] = line_len
-                self.total_chrom_len += line_len
+                self.total_genome_len += line_len
 
 # chrom_len = {
 #     "chr1": 51465340,
@@ -123,13 +124,17 @@ class Stat:
                             mite_total_len_int += self.mite_total_len[self.mite_names[i]]
 
                     if mite_total_len_int > 0:
-                        kmers_in_mites_total_norm = (kmers_in_mites_total_sum / mite_total_len_int) * self.parameters['normalization_size']
-                        kmers_out_mites_total_norm = ((kmerTotalOccurences - kmers_in_mites_total_sum) /
-                            (self.total_genome_len - mite_total_len_int)) * self.parameters['normalization_size']
+
+                        # kmers_in_mites_total_norm = (kmers_in_mites_total_sum / mite_total_len_int) * self.parameters['normalization_size']
+                        # kmers_out_mites_total_norm = ((kmerTotalOccurences - kmers_in_mites_total_sum) /
+                        #     (self.total_genome_len - mite_total_len_int)) * self.parameters['normalization_size']
                         a = round( (mite_total_len_int / self.total_genome_len) * kmerTotalOccurences )
                         b = round( ((self.total_genome_len - mite_total_len_int) / self.total_genome_len) * kmerTotalOccurences )
 
                         kmers_in_out_total_sum = kmerTotalOccurences - kmers_in_mites_total_sum
+
+                        print(kmerTotalOccurences, kmers_in_mites_total_sum)
+
                         _, p = stats.fisher_exact([[kmers_in_mites_total_sum, kmers_in_out_total_sum], [a, b]])
 
                         freq = kmers_in_mites_total_sum / (kmers_in_mites_total_sum + kmers_in_out_total_sum)
@@ -138,21 +143,25 @@ class Stat:
                                         name=kmerName, index=self.column_names)
                         self.data = self.data.append(row)
 
+
         corrected_p = multipletests(list(self.data['fisher_exac_p']), method='bonferroni')[self.BONFERRONI_OUT_INDEX]
 
         self.data['p_corrected_bon'] = corrected_p
 
     def stats_filtration(self):
         if self.parameters['kmer_thresh_min'] != '':
-            data_filtered_min = self.data.loc[self.data['p_corrected_bon'] > self.parameters['kmer_thresh_min']]
+            data_filtered_min = self.data.loc[self.data['p_corrected_bon'] > int(self.parameters['kmer_thresh_min'])]
 
         if self.parameters['kmer_thresh_max'] != '':
             if self.parameters['kmer_thresh_min'] != '':
                 data_filtered = data_filtered_min.loc[
-                    self.data['p_corrected_bon'] <= self.parameters['kmer_thresh_max']]
+                    self.data['p_corrected_bon'] <= int(self.parameters['kmer_thresh_max'])]
             else:
                 data_filtered = self.data.loc[
-                    self.data['p_corrected_bon'] <= self.parameters['kmer_thresh_max']]
+                    self.data['p_corrected_bon'] <= int(self.parameters['kmer_thresh_max'])]
+
+        if self.parameters['kmer_thresh_min'] == '' and self.parameters['kmer_thresh_max'] == '':
+            data_filtered = self.data
 
         return data_filtered
 

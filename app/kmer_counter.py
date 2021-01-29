@@ -77,9 +77,9 @@ class KmerCounter:
                 else:
                     data_kmer[line] = name_tmp
 
-        if len(list(data_kmer.keys())[0]) != self.parameters['kmer_length']:
-            print(f'{warning("Warning")} - The kmer length in {data_input["dump_file"]} file is not equal to '
-                  f'kmer length in config file ({self.parameters["kmer_length"]})')
+        if len(list(data_kmer.keys())[0]) != int(self.parameters['kmer_length']):
+            print(f'{warning("Warning")} - The kmer length in {os.path.basename(data_input["dump_file"])} ({len(list(data_kmer.keys())[0])} bp) file is not equal to '
+                  f'kmer length in config file ({self.parameters["kmer_length"]} bp)')
             return
 
         print("Loading '{}' file ...".format( data_input["chr_file"] ))
@@ -141,7 +141,7 @@ class KmerCounter:
             for kmer_occurence in kmer_occurences:
                 kmer_occurence = int(kmer_occurence)
                 # result = t[kmer_occurence + 1:kmer_occurence + 11]
-                result = t[kmer_occurence + 1:kmer_occurence + self.parameters['kmer_length'] + 1]
+                result = t[kmer_occurence + 1:kmer_occurence + int(self.parameters['kmer_length']) + 1]
                 if result:
                     if len( list(result) ) > 2:
                         print("\nThe interval tree length is higher than 2:", len( list(result) ), data_input["chr_name"])
@@ -160,7 +160,7 @@ class KmerCounter:
                     else:
                         result_parsed = list(result)[0]
                         if (kmer_occurence) >= (result_parsed.begin - 1) and \
-                            (kmer_occurence + self.parameters['kmer_length']) <= result_parsed.end:
+                            (kmer_occurence + int(self.parameters['kmer_length'])) <= result_parsed.end:
                             output_data[result_parsed.data] += 1
                         else:
                             output_data["edge"] += 1

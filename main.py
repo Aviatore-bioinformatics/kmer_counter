@@ -18,11 +18,11 @@ def main():
     if not fasta_to_oneline(parameters):
         return False
 
-    kc = kmer.KmerCounter(parameters)
-    kc.run()
-
-    tm = TableMerger(parameters)
-    tm.run()
+    # kc = kmer.KmerCounter(parameters)
+    # kc.run()
+    #
+    # tm = TableMerger(parameters)
+    # tm.run()
 
     stat = Stat(parameters)
     stat.run()
