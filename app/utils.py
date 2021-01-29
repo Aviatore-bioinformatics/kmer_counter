@@ -8,18 +8,19 @@ def fasta_to_oneline(parameters):
 
     for file_prefix in parameters['prefixes']:
         input_file = f'{file_prefix}.fasta'
+        input_file_path = os.path.join(parameters['data_dir'], input_file)
         output_file = f'{file_prefix}_oneLine.txt'
+        output_file_path = os.path.join(parameters['data_dir'], f'{file_prefix}_oneLine.txt')
 
-        if os.path.exists(output_file):
+        if os.path.exists(output_file_path):
             print(f'The output {output_file} file already exists. Skipping ...')
             continue
 
-        print('')
         print(f'Converting {input_file} into {output_file} ... ', end='', flush=True)
 
-        with open(input_file, 'r') as file_in:
+        with open(input_file_path, 'r') as file_in:
             try:
-                with open(output_file, 'w') as file_out:
+                with open(output_file_path, 'w') as file_out:
                     output = ""
 
                     for line in file_in:
