@@ -48,11 +48,11 @@ def soft_check():
     print(f'Checking required software ...')
 
     for soft in SOFT_REQUIREMENTS:
-        print(f'- {soft} ... ', end='')
+        print(f'- {soft} ... ', end='', flush=True)
         if which(soft):
             print(ok('ok'))
         else:
-            print(warning('fail'), end='')
+            print(warning('fail'), end='', flush=True)
             print(f' (You need to install {soft})')
             output = False
 
@@ -66,12 +66,12 @@ def pip_check():
     print("Checking required python packages ...")
 
     for package in PIP_REQUIREMENTS:
-        print(f'- {package} ... ', end='')
+        print(f'- {package} ... ', end='', flush=True)
 
         if package in installed:
             print(ok('ok'))
         else:
-            print(warning('fail'), end='')
+            print(warning('fail'), end='', flush=True)
             print(f' (You need to install {package})')
             output = False
 

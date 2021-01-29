@@ -1,7 +1,7 @@
 # jellyfish parameters
-kmer_length=20
+kmer_length=10
 hash_size=100M
-threads_number=1
+threads_number=2
 keep_intermediate_jf_files=no
 
 # FASTA files prefixes (comma-separated)

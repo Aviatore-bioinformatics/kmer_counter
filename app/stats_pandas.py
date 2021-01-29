@@ -12,7 +12,7 @@ class Stat:
         self.parameters = parameters
         self.BONFERRONI_OUT_INDEX = 1
         self.chrom_len = {}
-        self.total_chrom_len
+        self.total_chrom_len = 0
         self.mite_total_len = {}
         self.index = []
         self.mite_names = {}
@@ -40,9 +40,15 @@ class Stat:
             print(f'\r\033[0K{current_value} / {final_value} ({diff:.2f}%)', end='', flush=True)
 
     def run(self):
+        if not os.path.exists(self.merged_table_path):
+            print(
+                f"{warning('Warning')} - the merged table does not exist")
+            return
+
         self.chrom_len_calc()
         self.mite_total_len_calc()
         self.analyse()
+        self.save_stats_to_file(self.stats_filtration())
 
     def chrom_len_calc(self):
         for prefix in self.parameters['prefixes']:

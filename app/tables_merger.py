@@ -1,6 +1,7 @@
 import re
 import numpy as np
 import os
+from app.text_formating import warning, ok
 
 
 class TableMerger:
@@ -10,8 +11,8 @@ class TableMerger:
         self.merged_data = {}
 
     def run(self):
-        self.merge_tables()
-        self.write_merged_tables()
+        if self.merge_tables():
+            self.write_merged_tables()
 
     def merge_tables(self):
         lineSplit = re.compile(r'\t')
@@ -19,7 +20,12 @@ class TableMerger:
         if (os.path.exists(os.path.join(self.output_path, 'table_merged.txt'))):
             os.remove(os.path.join(self.output_path, 'table_merged.txt'))
 
-        for table in self.get_all_table_files():
+        tables = self.get_all_table_files()
+        if len(tables) == 0:
+            print(f"{warning('Warning')} - There is no tables to merge")
+            return False
+
+        for table in tables:
             print("Reading", table, "...")
 
             with open(os.path.join(self.output_path, table), 'r') as f:
@@ -40,12 +46,13 @@ class TableMerger:
                     except KeyError:
                         self.merged_data[line_splitted[0]] = np.array(line_splitted[1:])
 
+        return True
+
     def get_all_table_files(self):
         tables = []
-        prefixes = self.parameters['prefixes'].split(",")
 
         for file in os.listdir(self.output_path):
-            if file.split("_")[-1] in prefixes:
+            if file.split("_")[-1] in self.parameters['prefixes']:
                 tables.append(file)
 
         return tables

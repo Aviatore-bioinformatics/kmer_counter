@@ -5,6 +5,7 @@ from intervaltree import Interval, IntervalTree
 import time
 from multiprocessing import Pool
 import copy
+from app.text_formating import warning, ok
 import pandas as pd
 
 
@@ -36,6 +37,8 @@ class KmerCounter:
                 'chr_name': prefix,
                 'output_file': os.path.join(parameters['output_dir'], 'tables', f'table_{prefix}')
             }
+
+            self.data_inputs.append(data_input)
 
 
     def my_find(self, str1, str2):
@@ -73,6 +76,11 @@ class KmerCounter:
                     name_tmp = line[1:]
                 else:
                     data_kmer[line] = name_tmp
+
+        if len(list(data_kmer.keys())[0]) != self.parameters['kmer_length']:
+            print(f'{warning("Warning")} - The kmer length in {data_input["dump_file"]} file is not equal to '
+                  f'kmer length in config file ({self.parameters["kmer_length"]})')
+            return
 
         print("Loading '{}' file ...".format( data_input["chr_file"] ))
         with open(data_input["chr_file"], 'r') as f:
@@ -117,7 +125,9 @@ class KmerCounter:
 
         ttt = Timer()
         print("Started analysis ...")
-        log = open(time.strftime('%y-%m-%d_%H-%M_') + data_input["chr_name"] + "_log.txt", 'a+')
+        log_file_path = os.path.join(self.parameters['output_dir'], 'tables', time.strftime('%y-%m-%d_%H-%M_') + data_input["chr_name"] + "_log.txt")
+        # log = open(time.strftime('%y-%m-%d_%H-%M_') + data_input["chr_name"] + "_log.txt", 'a+')
+        log = open(log_file_path, 'a+')
         log.write("Analysis started at " + time.ctime() + "\n")
         log.flush()
         ttt.startt()
@@ -130,7 +140,8 @@ class KmerCounter:
 
             for kmer_occurence in kmer_occurences:
                 kmer_occurence = int(kmer_occurence)
-                result = t[kmer_occurence + 1:kmer_occurence + 11]
+                # result = t[kmer_occurence + 1:kmer_occurence + 11]
+                result = t[kmer_occurence + 1:kmer_occurence + self.parameters['kmer_length'] + 1]
                 if result:
                     if len( list(result) ) > 2:
                         print("\nThe interval tree length is higher than 2:", len( list(result) ), data_input["chr_name"])
@@ -149,7 +160,7 @@ class KmerCounter:
                     else:
                         result_parsed = list(result)[0]
                         if (kmer_occurence) >= (result_parsed.begin - 1) and \
-                            (kmer_occurence + 10) <= result_parsed.end:
+                            (kmer_occurence + self.parameters['kmer_length']) <= result_parsed.end:
                             output_data[result_parsed.data] += 1
                         else:
                             output_data["edge"] += 1
@@ -170,5 +181,8 @@ class KmerCounter:
         ttt.stopp()
 
     def run(self):
-        p = Pool(self.parameters['threads_number'])
-        p.map(self.worker, self.data_inputs)
+        with Pool(int(self.parameters['threads_number'])) as pool:
+            pool.map(self.worker, self.data_inputs)
+
+        # p = Pool(self.parameters['threads_number'])
+        # p.map(self.worker, self.data_inputs)
