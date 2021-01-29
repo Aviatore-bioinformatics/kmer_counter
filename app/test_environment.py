@@ -6,7 +6,10 @@ from app.text_formating import warning, ok
 JELLYFISH_OUT_DIR = 'jellyfish'
 
 PIP_REQUIREMENTS = [
-    "intervaltree"
+    "intervaltree",
+    "scipy",
+    "pandas",
+    "statsmodels"
 ]
 
 SOFT_REQUIREMENTS = [
@@ -49,8 +52,8 @@ def soft_check():
         if which(soft):
             print(ok('ok'))
         else:
-            print(warning('fail'))
-            print(f'You need to install {soft}.')
+            print(warning('fail'), end='')
+            print(f' (You need to install {soft})')
             output = False
 
     return output
@@ -68,15 +71,15 @@ def pip_check():
         if package in installed:
             print(ok('ok'))
         else:
-            print(warning('fail'))
-            print(f'You need to install {package}.')
+            print(warning('fail'), end='')
+            print(f' (You need to install {package})')
             output = False
 
     return output
 
 
 def test():
-    pip_check()
-    soft_check()
+    pip_output = pip_check()
+    soft_output = soft_check()
 
-    return True
+    return pip_output is True and soft_output is True
