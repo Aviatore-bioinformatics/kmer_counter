@@ -9,11 +9,11 @@ def main():
     if not test():
         return False
 
-    if not jellyfish(parameters):
-        return False
-
-    if not fasta_to_oneline(parameters):
-        return False
+    # if not jellyfish(parameters):
+    #     return False
+    #
+    # if not fasta_to_oneline(parameters):
+    #     return False
 
 
 if __name__ == '__main__':
