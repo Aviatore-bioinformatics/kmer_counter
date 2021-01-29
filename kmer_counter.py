@@ -90,6 +90,7 @@ data_inputs = [
 ]
 max_thread_No = 4
 
+
 def worker_controller(q):
     while True:
         input = q.get()
@@ -98,8 +99,9 @@ def worker_controller(q):
         worker(input)
         q.task_done()
 
+
 def worker(data_input):
-    print("Loading '{}' file ...".format( data_input["dump_file"] ))
+    print("Loading '{}' file ...".format(data_input["dump_file"]))
     data_kmer = {}
     name_tmp = ""
     with open(data_input["dump_file"], 'r') as file:

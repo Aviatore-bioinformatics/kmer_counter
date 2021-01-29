@@ -1,0 +1,10 @@
+# jellyfish parameters
+kmer_length=20
+hash_size=100M
+threads_number=1
+keep_intermediate_jf_files=no
+
+# FASTA files prefixes (comma-separated)
+# Prefixes must be equal to chromosomes' names
+prefixes=chr1
+output_dir=/media/veracrypt1/Lenovo/Dysk/2020/Projektt_Ali_MP/final_version/output
