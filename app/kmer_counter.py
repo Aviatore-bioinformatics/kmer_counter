@@ -78,9 +78,9 @@ class KmerCounter:
             chromosome = f.read()
 
         #----------------------------------------#
-        print("Loading 'MITEs.bed' file ...")
+        print(f"Loading '{os.path.basename(self.parameters['bed_file'])}' file ...")
         data_mites = []
-        with open("MITEs.bed", 'r') as f:
+        with open(self.parameters['bed_file'], 'r') as f:
             while True:
                 line = f.readline()
                 if line == '':
