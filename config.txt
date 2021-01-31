@@ -6,9 +6,9 @@ keep_intermediate_jf_files=no
 
 # FASTA files prefixes (comma-separated)
 # Prefixes must be equal to chromosomes' names
-prefixes=chr1-500,chr1-502
-output_dir=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/output
-data_dir=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data
+prefixes=chr1
+output_dir=/home/m3lk4g/PycharmProjects/kmer_counter/output
+data_dir=/home/m3lk4g/PycharmProjects/kmer_counter/data
 
 # k-mer frequency threshold
 # k-mers which frequency in MITEs is higher than the threshold will be considered for analysis
