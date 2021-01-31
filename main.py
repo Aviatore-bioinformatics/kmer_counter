@@ -19,11 +19,11 @@ def main():
     if not bulk_fasta_to_online(parameters):
         return False
 
-    # kc = kmer.KmerCounter(parameters)
-    # kc.run()
-    #
-    # tm = TableMerger(parameters)
-    # tm.run()
+    kc = kmer.KmerCounter(parameters)
+    kc.run()
+
+    tm = TableMerger(parameters)
+    tm.run()
 
     stat = Stat(parameters)
     stat.run()

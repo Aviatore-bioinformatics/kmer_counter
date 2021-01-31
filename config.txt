@@ -20,4 +20,4 @@ kmer_thresh_max=
 normalization_size=10000
 
 # Path to *.bed file
-bed_file=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/MITEs_head.bed
+bed_file=/home/m3lk4g/PycharmProjects/kmer_counter/data/test_mites.bed

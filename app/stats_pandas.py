@@ -133,7 +133,7 @@ class Stat:
 
                         kmers_in_out_total_sum = kmerTotalOccurences - kmers_in_mites_total_sum
 
-                        print(kmerTotalOccurences, kmers_in_mites_total_sum)
+                        # print(kmerTotalOccurences, kmers_in_mites_total_sum)
 
                         _, p = stats.fisher_exact([[kmers_in_mites_total_sum, kmers_in_out_total_sum], [a, b]])
 
@@ -149,6 +149,8 @@ class Stat:
         self.data['p_corrected_bon'] = corrected_p
 
     def stats_filtration(self):
+        # TODO First filtration step: All data with 'p_corrected_bon' > 0.05 must be filtered out
+        # TODO Second filtration step: All data wich freq is out of provided threshold range must be filtered out
         if self.parameters['kmer_thresh_min'] != '':
             data_filtered_min = self.data.loc[self.data['p_corrected_bon'] > int(self.parameters['kmer_thresh_min'])]
 

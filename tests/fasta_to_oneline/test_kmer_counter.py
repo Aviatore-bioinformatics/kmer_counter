@@ -1,7 +1,6 @@
 import unittest
 import os
 from app.utils import fasta_to_oneline
-from app.test_environment import read_config
 
 
 class MyTestCase(unittest.TestCase):

@@ -31,7 +31,7 @@ class TableMerger:
             with open(os.path.join(self.output_path, table), 'r') as f:
                 while True:
                     line = f.readline()
-                    if line is "":
+                    if line == "":
                         break
 
                     line = line.rstrip()
