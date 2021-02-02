@@ -28,15 +28,16 @@ class Stat:
                 print(f"{warning('Warning')} - could not create directory {os.path.join(parameters['output_dir'], 'stats')}")
                 return
 
-        if os.path.exists(os.path.join(parameters['output_dir'], 'stats', 'stats.txt')):
+        if os.path.exists(os.path.join(parameters['output_dir'], 'stats', 'stats.txt')) and self.parameters['remove_stats_file'] == 'yes':
+            print(f"Output 'stats.txt' file exists. Removing ... ", end='')
             os.remove(os.path.join(parameters['output_dir'], 'stats', 'stats.txt'))
-
+            print(ok('ok'))
 
     def progress_bar(self, current_value, final_value):
         offset = 100
         diff = (current_value / final_value) * 100
 
-        if not current_value % offset:
+        if current_value % offset:
             print(f'\r\033[0K{current_value} / {final_value} ({diff:.2f}%)', end='', flush=True)
 
     def run(self):
@@ -54,12 +55,11 @@ class Stat:
                 return False
         else:
             print(f"The output 'stats.txt' file exists. Loading saved data ... ", end='')
-            self.data = pd.read_csv(os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')), sep='\t')
+            self.data = pd.read_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')
             print(ok('ok'))
 
-        print(f"Filter statistics data")
-
         try:
+            print(f"\n\nFilter statistics data:")
             self.filter_kmers_by_p_corrected_bon_thresh()
             self.filter_kmers_by_freq_higher()
             self.filter_kmers_by_freq_lesser()
@@ -67,7 +67,8 @@ class Stat:
             self.save_stats_to_file()
 
             return True
-        except Exception:
+        except Exception as e:
+            print(f"Exception: {e}")
             return False
 
     def chrom_len_calc(self):
@@ -168,15 +169,25 @@ class Stat:
         self.data['p_corrected_bon'] = corrected_p
 
     def filter_kmers_by_p_corrected_bon_thresh(self):
-        self.data = self.data.loc[self.data['p_corrected_bon'] < 0.05]
+        print(f"- filtering by bonferoni ", end='')
+        self.data = self.data.loc[self.data['p_corrected_bon'] <= float(self.parameters['p_corrected_bon_thresh'])]
+
+        print(ok('ok'))
 
     def filter_kmers_by_freq_higher(self):
+        print(f"- filtering by freq higher ", end='')
+
         if self.parameters['kmer_thresh_min'] != '':
             self.data = self.data.loc[self.data['freq'] > (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_min'])]
 
+        print(ok('ok'))
+
     def filter_kmers_by_freq_lesser(self):
+        print(f"- filtering by freq lesser ", end='')
         if self.parameters['kmer_thresh_max'] != '':
             self.data = self.data.loc[self.data['freq'] < (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_max'])]
+
+        print(ok('ok'))
 
     def stats_filtration(self):
         # TODO Second filtration step: All data wich freq is out of provided threshold range must be filtered out
@@ -189,4 +200,5 @@ class Stat:
         return self.data
 
     def save_stats_to_file(self):
+        print(f"\nSaving data to file 'stats.txt'")
         self.data.to_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')
