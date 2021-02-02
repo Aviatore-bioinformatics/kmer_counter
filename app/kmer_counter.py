@@ -132,7 +132,10 @@ class KmerCounter:
         log.flush()
         ttt.startt()
         kmer_No = 0
+        kmer_coords = {}
+
         for kmer in data_kmer.keys():
+            kmer_coords[kmer] = []
 
             output_data = copy.deepcopy(output_data_template)
 
@@ -160,9 +163,13 @@ class KmerCounter:
                             output_data[interval.data + "_edge"] += 1
                     else:
                         result_parsed = list(result)[0]
+                        result_parsed_list = list(result_parsed)
+
                         if (kmer_occurence) >= (result_parsed.begin - 1) and \
                             (kmer_occurence + int(self.parameters['kmer_length'])) <= result_parsed.end:
                             output_data[result_parsed.data] += 1
+                            kmer_coords[kmer].append(data_input["chr_name"] + ":" + "-".join(
+                                [str(result_parsed_list[0]), str(result_parsed_list[1])]))
                         else:
                             output_data["edge"] += 1
                             output_data[result_parsed.data + "_edge"] += 1
@@ -180,6 +187,15 @@ class KmerCounter:
         log.close()
         output.close()
         ttt.stopp()
+
+        self.write_kmer_coords_to_file(data_input['chr_name'], kmer_coords)
+
+    def write_kmer_coords_to_file(self, prefix, kmer_coords):
+        with open(os.path.join(self.parameters['output_dir'], 'tables', f"table_{prefix}_coords.txt"), 'w') as file:
+            for key in kmer_coords.keys():
+                if len(kmer_coords[key]) > 0:
+                    file.write(key + "\n")
+                    file.write("\n".join(kmer_coords[key]) + "\n\n")
 
     def run(self):
         try:
