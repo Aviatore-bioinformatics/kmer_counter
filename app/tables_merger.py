@@ -11,8 +11,13 @@ class TableMerger:
         self.merged_data = {}
 
     def run(self):
-        if self.merge_tables():
-            self.write_merged_tables()
+        try:
+            if self.merge_tables():
+                self.write_merged_tables()
+
+            return True
+        except Exception:
+            return False
 
     def merge_tables(self):
         lineSplit = re.compile(r'\t')

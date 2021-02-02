@@ -43,17 +43,32 @@ class Stat:
         if not os.path.exists(self.merged_table_path):
             print(
                 f"{warning('Warning')} - the merged table does not exist")
-            return
+            return False
 
-        self.chrom_len_calc()
-        self.mite_total_len_calc()
-        self.analyse()
+        if not os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')):
+            try:
+                self.chrom_len_calc()
+                self.mite_total_len_calc()
+                self.analyse()
+            except Exception:
+                return False
+        else:
+            print(f"The output 'stats.txt' file exists. Loading saved data ... ", end='')
+            self.data = pd.read_csv(os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')), sep='\t')
+            print(ok('ok'))
 
-        # self.filter_kmers_by_p_corrected_bon_thresh()
-        # self.filter_kmers_by_freq_higher()
-        # self.filter_kmers_by_freq_lesser()
+        print(f"Filter statistics data")
 
-        self.save_stats_to_file()
+        try:
+            self.filter_kmers_by_p_corrected_bon_thresh()
+            self.filter_kmers_by_freq_higher()
+            self.filter_kmers_by_freq_lesser()
+
+            self.save_stats_to_file()
+
+            return True
+        except Exception:
+            return False
 
     def chrom_len_calc(self):
         for prefix in self.parameters['prefixes']:

@@ -182,8 +182,13 @@ class KmerCounter:
         ttt.stopp()
 
     def run(self):
-        with Pool(int(self.parameters['threads_number'])) as pool:
-            pool.map(self.worker, self.data_inputs)
+        try:
+            with Pool(int(self.parameters['threads_number'])) as pool:
+                pool.map(self.worker, self.data_inputs)
+
+            return True
+        except Exception:
+            return False
 
         # p = Pool(self.parameters['threads_number'])
         # p.map(self.worker, self.data_inputs)

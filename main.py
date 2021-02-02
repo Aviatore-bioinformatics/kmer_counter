@@ -20,13 +20,16 @@ def main():
         return False
 
     kc = kmer.KmerCounter(parameters)
-    kc.run()
+    if not kc.run():
+        return False
 
     tm = TableMerger(parameters)
-    tm.run()
+    if not tm.run():
+        return False
 
     stat = Stat(parameters)
-    stat.run()
+    if not stat.run():
+        return False
 
 
 if __name__ == '__main__':
