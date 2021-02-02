@@ -48,8 +48,12 @@ class Stat:
         self.chrom_len_calc()
         self.mite_total_len_calc()
         self.analyse()
-        self.save_stats_to_file(self.stats_filtration())
-        self.save_stats_to_file(self.data)
+
+        # self.filter_kmers_by_p_corrected_bon_thresh()
+        # self.filter_kmers_by_freq_higher()
+        # self.filter_kmers_by_freq_lesser()
+
+        self.save_stats_to_file()
 
     def chrom_len_calc(self):
         for prefix in self.parameters['prefixes']:
@@ -148,24 +152,26 @@ class Stat:
 
         self.data['p_corrected_bon'] = corrected_p
 
-    def stats_filtration(self):
-        # TODO First filtration step: All data with 'p_corrected_bon' > 0.05 must be filtered out
-        # TODO Second filtration step: All data wich freq is out of provided threshold range must be filtered out
+    def filter_kmers_by_p_corrected_bon_thresh(self):
+        self.data = self.data.loc[self.data['p_corrected_bon'] < 0.05]
+
+    def filter_kmers_by_freq_higher(self):
         if self.parameters['kmer_thresh_min'] != '':
-            data_filtered_min = self.data.loc[self.data['p_corrected_bon'] > int(self.parameters['kmer_thresh_min'])]
+            self.data = self.data.loc[self.data['freq'] > (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_min'])]
 
+    def filter_kmers_by_freq_lesser(self):
         if self.parameters['kmer_thresh_max'] != '':
-            if self.parameters['kmer_thresh_min'] != '':
-                data_filtered = data_filtered_min.loc[
-                    self.data['p_corrected_bon'] <= int(self.parameters['kmer_thresh_max'])]
-            else:
-                data_filtered = self.data.loc[
-                    self.data['p_corrected_bon'] <= int(self.parameters['kmer_thresh_max'])]
+            self.data = self.data.loc[self.data['freq'] < (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_max'])]
 
-        if self.parameters['kmer_thresh_min'] == '' and self.parameters['kmer_thresh_max'] == '':
-            data_filtered = self.data
+    def stats_filtration(self):
+        # TODO Second filtration step: All data wich freq is out of provided threshold range must be filtered out
+        self.filter_kmers_by_p_corrected_bon_thresh()
 
-        return data_filtered
+        self.filter_kmers_by_freq_higher()
 
-    def save_stats_to_file(self, data):
-        data.to_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')
+        self.filter_kmers_by_freq_lesser()
+
+        return self.data
+
+    def save_stats_to_file(self):
+        self.data.to_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')

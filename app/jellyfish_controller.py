@@ -27,7 +27,8 @@ def kmer_counting(fasta_file, jellyfish_file, parameters):
                              '-m', parameters['kmer_length'],
                              '-s', parameters['hash_size'],
                              '-t', parameters['threads_number'],
-                             '-C', fasta_file,
+                             # '-C', fasta_file,
+                             fasta_file,
                              '-o', jellyfish_file], capture_output=True, text=True)
 
     return check(result)

@@ -141,7 +141,8 @@ class KmerCounter:
             for kmer_occurence in kmer_occurences:
                 kmer_occurence = int(kmer_occurence)
                 # result = t[kmer_occurence + 1:kmer_occurence + 11]
-                result = t[kmer_occurence + 1:kmer_occurence + int(self.parameters['kmer_length']) + 1]
+                # result = t[kmer_occurence + 1:kmer_occurence + int(self.parameters['kmer_length']) + 1]
+                result = t[kmer_occurence:kmer_occurence + int(self.parameters['kmer_length']) + 1]
                 if result:
                     if len( list(result) ) > 2:
                         print("\nThe interval tree length is higher than 2:", len( list(result) ), data_input["chr_name"])
@@ -149,7 +150,7 @@ class KmerCounter:
                         log.flush()
                         log.close()
                         exit(1)
-                    elif len( list(result) ) > 1:
+                    elif len( list(result) ) > 1:  # True if a k-mer overlaps two mites
                         print("\nThe interval tree length is higher than 1.", data_input["chr_name"])
                         log.write("\t".join(["1<intTree<2", kmer, str(kmer_occurence), str(list(result))]) + "\n")
                         log.flush()
