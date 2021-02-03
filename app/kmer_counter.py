@@ -5,21 +5,33 @@ from intervaltree import Interval, IntervalTree
 import time
 from multiprocessing import Pool
 import copy
-from app.text_formating import red, green
+from app.text_formating import red, green, print_info, print_logo
 import pandas as pd
 
 
 class Timer:
-    def __init__(self):
+    def __init__(self, kmers_number, worker_name):
         self.start = None
         self.stop = None
+        self.counter = 0
+        self.kmers_number = kmers_number
+        self.worker_name = worker_name
     
     def startt(self):
         self.start = time.time()
 
     def stopp(self):
         self.stop = time.time()
-        print("\n", self.stop - self.start, "sek")
+        diff = self.stop - self.start
+        print_info(f"Processing kmers finished in {diff:.2f} sek", self.worker_name)
+
+    def print_progress(self):
+        self.counter += 1
+        offset = 100
+        diff = (self.counter / self.kmers_number) * 100
+
+        if not self.counter % offset or self.counter == self.kmers_number:
+            print_info(f'Processed {self.counter} / {self.kmers_number} ({diff:.2f}%) kmers ...', self.worker_name)
 
 
 class KmerCounter:
@@ -61,9 +73,13 @@ class KmerCounter:
             q.task_done()
 
     def worker(self, data_input):
-        print("Loading '{}' file ...".format(data_input["dump_file"]))
+        # print("Loading '{}' file ...".format(data_input["dump_file"]))
+        worker_name = f"{data_input['chr_name']} worker"
         data_kmer = {}
         name_tmp = ""
+
+        print_info(f"Start reading {os.path.basename(data_input['dump_file'])} file", worker_name)
+
         with open(data_input["dump_file"], 'r') as file:
             cont = True
             while cont:
@@ -77,17 +93,19 @@ class KmerCounter:
                 else:
                     data_kmer[line] = name_tmp
 
+        print_info(f"Reading {os.path.basename(data_input['dump_file'])} file completed. Read {len(data_kmer)} kmers.", worker_name)
+
         if len(list(data_kmer.keys())[0]) != int(self.parameters['kmer_length']):
-            print(f'{red("Warning")} - The kmer length in {os.path.basename(data_input["dump_file"])} ({len(list(data_kmer.keys())[0])} bp) file is not equal to '
-                  f'kmer length in config file ({self.parameters["kmer_length"]} bp)')
+            print_info(f'{red("Warning")} - The kmer length in {os.path.basename(data_input["dump_file"])} ({len(list(data_kmer.keys())[0])} bp) file is not equal to '
+                  f'kmer length in config file ({self.parameters["kmer_length"]} bp)', worker_name)
             return
 
-        print("Loading '{}' file ...".format( data_input["chr_file"] ))
+        print_info("Loading '{}' file ...".format( data_input["chr_file"] ), worker_name)
         with open(data_input["chr_file"], 'r') as f:
             chromosome = f.read()
 
         #----------------------------------------#
-        print(f"Loading '{os.path.basename(self.parameters['bed_file'])}' file ...")
+        print_info(f"Loading '{os.path.basename(self.parameters['bed_file'])}' file ...", worker_name)
         data_mites = []
         with open(self.parameters['bed_file'], 'r') as f:
             while True:
@@ -99,7 +117,7 @@ class KmerCounter:
         #----------------------------------------#
 
         if os.path.exists( data_input["output_file"] ):
-            print("The file '{}' exists. Removing ...".format(data_input["output_file"]))
+            print_info("The file '{}' exists. Removing ...".format(data_input["output_file"]), worker_name)
             os.remove(data_input["output_file"])
 
         output = open(data_input["output_file"], 'a+')
@@ -123,18 +141,23 @@ class KmerCounter:
         output.write("\t".join(["k-mer", "total_occurences_in_{}".format(data_input["chr_name"]), "\t".join(sorted(mite_names)), "edge", "genome"]))
         output.write("\n")
 
-        ttt = Timer()
-        print("Started analysis ...")
+        timer = Timer(len(data_kmer), worker_name)
+        timer.startt()
+
+        print_info("Started analysis ...", worker_name)
+
         log_file_path = os.path.join(self.parameters['output_dir'], 'tables', time.strftime('%y-%m-%d_%H-%M_') + data_input["chr_name"] + "_log.txt")
         # log = open(time.strftime('%y-%m-%d_%H-%M_') + data_input["chr_name"] + "_log.txt", 'a+')
         log = open(log_file_path, 'a+')
         log.write("Analysis started at " + time.ctime() + "\n")
         log.flush()
-        ttt.startt()
+
         kmer_No = 0
         kmer_coords = {}
 
         for kmer in data_kmer.keys():
+            timer.print_progress()
+
             kmer_coords[kmer] = []
 
             output_data = copy.deepcopy(output_data_template)
@@ -148,13 +171,13 @@ class KmerCounter:
                 result = t[kmer_occurence:kmer_occurence + int(self.parameters['kmer_length']) + 1]
                 if result:
                     if len( list(result) ) > 2:
-                        print("\nThe interval tree length is higher than 2:", len( list(result) ), data_input["chr_name"])
+                        print_info(f"\nThe interval tree length is higher than 2: {len( list(result) )} {data_input['chr_name']}", worker_name)
                         log.write("\t".join(["intTree>2", kmer, str(kmer_occurence), mite_name]) + "\n")
                         log.flush()
                         log.close()
                         exit(1)
                     elif len( list(result) ) > 1:  # True if a k-mer overlaps two mites
-                        print("\nThe interval tree length is higher than 1.", data_input["chr_name"])
+                        print_info(f"\nThe interval tree length is higher than 1: {data_input['chr_name']}", worker_name)
                         log.write("\t".join(["1<intTree<2", kmer, str(kmer_occurence), str(list(result))]) + "\n")
                         log.flush()
 
@@ -186,7 +209,7 @@ class KmerCounter:
             output.write("\n")
         log.close()
         output.close()
-        ttt.stopp()
+        timer.stopp()
 
         self.write_kmer_coords_to_file(data_input['chr_name'], kmer_coords)
 
@@ -198,6 +221,7 @@ class KmerCounter:
                     file.write("\n".join(kmer_coords[key]) + "\n\n")
 
     def run(self):
+        print_logo("K-mer counting")
         try:
             with Pool(int(self.parameters['threads_number'])) as pool:
                 pool.map(self.worker, self.data_inputs)

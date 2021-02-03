@@ -2,7 +2,7 @@ import os
 import scipy.stats as stats
 import pandas as pd
 from statsmodels.sandbox.stats.multicomp import multipletests
-from app.text_formating import red, green
+from app.text_formating import red, green, print_info, print_warning, print_logo
 # EXAMPLE: multipletests([0.01, 0.02, 0.03], method='bonferroni')
 # RETURNS: (array([ True, False, False]), array([0.03, 0.06, 0.09]), 0.016952427508441503, 0.016666666666666666)
 
@@ -37,29 +37,31 @@ class Stat:
         offset = 100
         diff = (current_value / final_value) * 100
 
-        if current_value % offset:
+        if not current_value % offset or current_value == final_value:
             print(f'\r\033[0K{current_value} / {final_value} ({diff:.2f}%)', end='', flush=True)
 
     def run(self):
+        print_logo("Statistic analysis")
+
         if not os.path.exists(self.merged_table_path):
-            print(
-                f"{red('Warning')} - the merged table does not exist")
+            print_warning("the merged table does not exist")
             return False
 
         if not os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')):
             try:
+                print_info("Applying Fisher test ...")
                 self.chrom_len_calc()
                 self.mite_total_len_calc()
                 self.analyse()
             except Exception:
                 return False
         else:
-            print(f"The output 'stats.txt' file exists. Loading saved data ... ", end='')
+            print_info(f"The output 'stats.txt' file exists. Loading saved data ... ")
             self.data = pd.read_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')
-            print(green('ok'))
 
         try:
-            print(f"\n\nFilter statistics data:")
+            print("")
+            print_info(f"Filter statistics data:")
             self.filter_kmers_by_p_corrected_bon_thresh()
             self.filter_kmers_by_freq_higher()
             self.filter_kmers_by_freq_lesser()
@@ -168,13 +170,13 @@ class Stat:
         self.data['p_corrected_bon'] = corrected_p
 
     def filter_kmers_by_p_corrected_bon_thresh(self):
-        print(f"- filtering by bonferoni ", end='')
+        print(f"- filtering by bonferoni ... ", end='')
         self.data = self.data.loc[self.data['p_corrected_bon'] <= float(self.parameters['p_corrected_bon_thresh'])]
 
         print(green('ok'))
 
     def filter_kmers_by_freq_higher(self):
-        print(f"- filtering by freq higher ", end='')
+        print(f"- filtering by freq higher ... ", end='')
 
         if self.parameters['kmer_thresh_min'] != '':
             self.data = self.data.loc[self.data['freq'] > (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_min'])]
@@ -182,7 +184,7 @@ class Stat:
         print(green('ok'))
 
     def filter_kmers_by_freq_lesser(self):
-        print(f"- filtering by freq lesser ", end='')
+        print(f"- filtering by freq lesser ... ", end='')
         if self.parameters['kmer_thresh_max'] != '':
             self.data = self.data.loc[self.data['freq'] < (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_max'])]
 

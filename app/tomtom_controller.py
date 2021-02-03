@@ -1,6 +1,6 @@
 import os
 import subprocess
-from app.text_formating import red, green, print_info
+from app.text_formating import red, green, print_info, print_warning, print_logo
 
 
 class Tomtom:
@@ -14,6 +14,7 @@ class Tomtom:
         self.output_meme_file_path = os.path.join(self.parameters['output_dir'], 'tomtom', "kmers.meme")
 
     def run(self):
+        print_logo("K-mer comparing")
         self.kmers_to_meme()
         self.tomtom()
 
@@ -23,13 +24,12 @@ class Tomtom:
         """Converts kmer sequences into MEME format and saves them to the 'kmers.meme' file"""
 
         if os.path.exists(self.output_meme_file_path) and self.parameters['keep_kmers_meme'] == 'no':
-            print(f"The file 'kmers.meme' exists. Removing ... ", end='')
+            print_info(f"The file 'kmers.meme' exists. Removing ... ")
             os.remove(self.output_meme_file_path)
-            print(green('ok'))
         else:
-            print_info("Keeping 'kmers.meme' file genereated in the previous run.")
+            print_info("Keeping 'kmers.meme' file generated in the previous run.")
 
-        print(f"\nConverting kmers into MEME format ... ", end='')
+        print_info(f"Converting kmers into MEME format ... ")
 
         with open(self.output_meme_file_path, 'a+') as output:
             with open(self.stats_file_path, 'r') as file:
@@ -41,15 +41,14 @@ class Tomtom:
                         result = subprocess.run(['iupac2meme', line_splitted[0]], capture_output=True, text=True)
                         output.write(result.stdout)
 
-        print(green('ok'))
-
     def tomtom(self):
         """Compares kmer motifs with database using tomtom"""
-        print(f"Comparing kmer motifs with database using tomtom ... ", flush=True)
+        print_info(f"Comparing kmer motifs with database using tomtom ... ")
 
         parameters = ['tomtom']
 
-        parameters.append('-min-overlap')
+        # parameters.append('-min-overlap')
+        parameters.append('-min-overlaps')
         parameters.append(self.parameters['min_overlap'])
 
         if self.parameters['internal'] == 'yes':
@@ -80,7 +79,14 @@ class Tomtom:
                     print(f"DEBUG: {output}")
                     raise IndexError
 
-        print(f"\nProcessing completed", flush=True)
+        print("")
+
+        if not process.returncode:
+            print_info(f"Processing completed")
+            print_info(f"Report in HTML format is available at: ./output/tomtom/tomtom_out/tomtom.html")
+        else:
+            print_warning("Something went wrong with tomtom run. Used command:")
+            print(" ".join(parameters))
 
 
 

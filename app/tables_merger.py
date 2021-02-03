@@ -1,7 +1,7 @@
 import re
 import numpy as np
 import os
-from app.text_formating import red, green
+from app.text_formating import red, green, print_logo, print_info, print_warning
 
 
 class TableMerger:
@@ -11,6 +11,7 @@ class TableMerger:
         self.merged_data = {}
 
     def run(self):
+        print_logo("Merging tables")
         try:
             if self.merge_tables():
                 self.write_merged_tables()
@@ -27,11 +28,11 @@ class TableMerger:
 
         tables = self.get_all_table_files()
         if len(tables) == 0:
-            print(f"{red('Warning')} - There is no tables to merge")
+            print_warning("There is no tables to merge")
             return False
 
         for table in tables:
-            print("Reading", table, "...")
+            print_info(f"Reading {table} ...")
 
             with open(os.path.join(self.output_path, table), 'r') as f:
                 while True:
@@ -50,6 +51,8 @@ class TableMerger:
                         self.merged_data[line_splitted[0]] += np.array(line_splitted[1:])
                     except KeyError:
                         self.merged_data[line_splitted[0]] = np.array(line_splitted[1:])
+
+        print_info(f"Merging completed")
 
         return True
 
