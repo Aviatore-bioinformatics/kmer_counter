@@ -1,0 +1,11 @@
+certifi==2020.12.5
+intervaltree==3.1.0
+numpy==1.19.5
+pandas==1.2.1
+patsy==0.5.1
+python-dateutil==2.8.1
+pytz==2020.5
+scipy==1.6.0
+six==1.15.0
+sortedcontainers==2.3.0
+statsmodels==0.12.1
