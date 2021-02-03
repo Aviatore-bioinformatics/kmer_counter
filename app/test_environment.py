@@ -1,7 +1,7 @@
 from shutil import which
 import os
 import pkg_resources
-from app.text_formating import warning, ok
+from app.text_formating import red, green
 
 JELLYFISH_OUT_DIR = 'jellyfish'
 
@@ -13,7 +13,9 @@ PIP_REQUIREMENTS = [
 ]
 
 SOFT_REQUIREMENTS = [
-    "jellyfish"
+    "jellyfish",
+    "iupac2meme",
+    "tomtom"
 ]
 
 
@@ -50,9 +52,9 @@ def soft_check():
     for soft in SOFT_REQUIREMENTS:
         print(f'- {soft} ... ', end='', flush=True)
         if which(soft):
-            print(ok('ok'))
+            print(green('ok'))
         else:
-            print(warning('fail'), end='', flush=True)
+            print(red('fail'), end='', flush=True)
             print(f' (You need to install {soft})')
             output = False
 
@@ -69,9 +71,9 @@ def pip_check():
         print(f'- {package} ... ', end='', flush=True)
 
         if package in installed:
-            print(ok('ok'))
+            print(green('ok'))
         else:
-            print(warning('fail'), end='', flush=True)
+            print(red('fail'), end='', flush=True)
             print(f' (You need to install {package})')
             output = False
 

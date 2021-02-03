@@ -5,6 +5,7 @@ import app.kmer_counter as kmer
 from app.tables_merger import TableMerger
 from app.stats_pandas import Stat
 from app.fasta_to_oneline_controller import bulk_fasta_to_online
+from app.tomtom_controller import Tomtom
 
 
 def main():
@@ -29,6 +30,10 @@ def main():
 
     stat = Stat(parameters)
     if not stat.run():
+        return False
+
+    tomtom = Tomtom(parameters)
+    if not tomtom.run():
         return False
 
 

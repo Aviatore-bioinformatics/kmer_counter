@@ -28,3 +28,18 @@ normalization_size=10000
 
 # Path to *.bed file
 bed_file=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/test_mites.bed
+
+
+# TOMTOM PARAMETERS
+# Write 'yes' to keep the 'kmers.meme' file created in the previous run, accepted values: ['yes', 'no']
+keep_kmers_meme=yes
+# motif database file path (MEME format)
+motif_database=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/motif_db/JASPAR_plants.meme
+# Type of significance threshold, accepted values: ['e-value', 'q-value']
+threshold_type=q-value
+# Threshold value, accepted values: float number between 0 and 1
+threshold_value=0.5
+# This parameter forces the shorter motif to be completely contained in the longer motif, accepted values: ['yes', 'no']
+internal=no
+# Only report motif matches that overlap by min overlap positions or more. In case a query motif is smaller than min overlap, then the motif's width is used as the minimum overlap for that query
+min_overlap=1

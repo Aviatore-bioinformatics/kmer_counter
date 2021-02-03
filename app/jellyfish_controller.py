@@ -1,14 +1,14 @@
 import subprocess
 import os
-from app.text_formating import warning, ok
+from app.text_formating import red, green
 
 
 def check(result):
     try:
         result.check_returncode()
-        print(ok('ok'))
+        print(green('ok'))
     except subprocess.CalledProcessError:
-        print(warning('fail'))
+        print(red('fail'))
 
         print('Something went wrong during k-mer counting.')
         print('Please, check the stderr output:\n')
@@ -49,9 +49,9 @@ def remove_jf_file(jellyfish_file, parameters):
 
         try:
             os.remove(jellyfish_file)
-            print(ok('ok'))
+            print(green('ok'))
         except FileNotFoundError:
-            print(warning('fail'))
+            print(red('fail'))
             print(f'The {jellyfish_file} file was not found.')
 
 

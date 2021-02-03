@@ -5,7 +5,7 @@ from intervaltree import Interval, IntervalTree
 import time
 from multiprocessing import Pool
 import copy
-from app.text_formating import warning, ok
+from app.text_formating import red, green
 import pandas as pd
 
 
@@ -78,7 +78,7 @@ class KmerCounter:
                     data_kmer[line] = name_tmp
 
         if len(list(data_kmer.keys())[0]) != int(self.parameters['kmer_length']):
-            print(f'{warning("Warning")} - The kmer length in {os.path.basename(data_input["dump_file"])} ({len(list(data_kmer.keys())[0])} bp) file is not equal to '
+            print(f'{red("Warning")} - The kmer length in {os.path.basename(data_input["dump_file"])} ({len(list(data_kmer.keys())[0])} bp) file is not equal to '
                   f'kmer length in config file ({self.parameters["kmer_length"]} bp)')
             return
 

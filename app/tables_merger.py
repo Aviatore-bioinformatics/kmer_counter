@@ -1,7 +1,7 @@
 import re
 import numpy as np
 import os
-from app.text_formating import warning, ok
+from app.text_formating import red, green
 
 
 class TableMerger:
@@ -27,7 +27,7 @@ class TableMerger:
 
         tables = self.get_all_table_files()
         if len(tables) == 0:
-            print(f"{warning('Warning')} - There is no tables to merge")
+            print(f"{red('Warning')} - There is no tables to merge")
             return False
 
         for table in tables:

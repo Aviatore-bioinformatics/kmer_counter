@@ -2,7 +2,7 @@ import os
 import scipy.stats as stats
 import pandas as pd
 from statsmodels.sandbox.stats.multicomp import multipletests
-from app.text_formating import warning, ok
+from app.text_formating import red, green
 # EXAMPLE: multipletests([0.01, 0.02, 0.03], method='bonferroni')
 # RETURNS: (array([ True, False, False]), array([0.03, 0.06, 0.09]), 0.016952427508441503, 0.016666666666666666)
 
@@ -25,13 +25,13 @@ class Stat:
             os.mkdir(os.path.join(parameters['output_dir'], 'stats'))
 
             if not os.path.exists(os.path.join(parameters['output_dir'], 'stats')):
-                print(f"{warning('Warning')} - could not create directory {os.path.join(parameters['output_dir'], 'stats')}")
+                print(f"{red('Warning')} - could not create directory {os.path.join(parameters['output_dir'], 'stats')}")
                 return
 
         if os.path.exists(os.path.join(parameters['output_dir'], 'stats', 'stats.txt')) and self.parameters['remove_stats_file'] == 'yes':
             print(f"Output 'stats.txt' file exists. Removing ... ", end='')
             os.remove(os.path.join(parameters['output_dir'], 'stats', 'stats.txt'))
-            print(ok('ok'))
+            print(green('ok'))
 
     def progress_bar(self, current_value, final_value):
         offset = 100
@@ -43,7 +43,7 @@ class Stat:
     def run(self):
         if not os.path.exists(self.merged_table_path):
             print(
-                f"{warning('Warning')} - the merged table does not exist")
+                f"{red('Warning')} - the merged table does not exist")
             return False
 
         if not os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')):
@@ -56,7 +56,7 @@ class Stat:
         else:
             print(f"The output 'stats.txt' file exists. Loading saved data ... ", end='')
             self.data = pd.read_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')
-            print(ok('ok'))
+            print(green('ok'))
 
         try:
             print(f"\n\nFilter statistics data:")
@@ -163,7 +163,6 @@ class Stat:
                                         name=kmerName, index=self.column_names)
                         self.data = self.data.append(row)
 
-
         corrected_p = multipletests(list(self.data['fisher_exac_p']), method='bonferroni')[self.BONFERRONI_OUT_INDEX]
 
         self.data['p_corrected_bon'] = corrected_p
@@ -172,7 +171,7 @@ class Stat:
         print(f"- filtering by bonferoni ", end='')
         self.data = self.data.loc[self.data['p_corrected_bon'] <= float(self.parameters['p_corrected_bon_thresh'])]
 
-        print(ok('ok'))
+        print(green('ok'))
 
     def filter_kmers_by_freq_higher(self):
         print(f"- filtering by freq higher ", end='')
@@ -180,14 +179,14 @@ class Stat:
         if self.parameters['kmer_thresh_min'] != '':
             self.data = self.data.loc[self.data['freq'] > (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_min'])]
 
-        print(ok('ok'))
+        print(green('ok'))
 
     def filter_kmers_by_freq_lesser(self):
         print(f"- filtering by freq lesser ", end='')
         if self.parameters['kmer_thresh_max'] != '':
             self.data = self.data.loc[self.data['freq'] < (self.data['mite_total_len'] / self.total_genome_len) * int(self.parameters['kmer_thresh_max'])]
 
-        print(ok('ok'))
+        print(green('ok'))
 
     def stats_filtration(self):
         # TODO Second filtration step: All data wich freq is out of provided threshold range must be filtered out

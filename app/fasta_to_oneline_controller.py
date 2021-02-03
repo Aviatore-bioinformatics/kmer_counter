@@ -1,6 +1,6 @@
 import os
 from app.utils import fasta_to_oneline
-from app.text_formating import warning, ok
+from app.text_formating import red, green
 
 
 def bulk_fasta_to_online(parameters):
@@ -22,13 +22,13 @@ def bulk_fasta_to_online(parameters):
         try:
             fasta_to_oneline(input_file_path, output_file_path)
         except Exception as e:
-            print(warning('fail'))
+            print(red('fail'))
             print(f'Something went wrong during saving to the {output_file} file.')
             print('Please, check the stderr output:\n')
             print(e)
 
             return False
 
-    print(ok('ok'))
+    print(green('ok'))
 
     return True
