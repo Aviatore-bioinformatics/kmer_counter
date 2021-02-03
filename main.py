@@ -4,7 +4,7 @@ from app.utils import fasta_to_oneline
 import app.kmer_counter as kmer
 from app.tables_merger import TableMerger
 from app.stats_pandas import Stat
-from app.fasta_to_oneline_controller import bulk_fasta_to_online
+from app.fasta_to_oneline_controller import bulk_fasta_to_oneline
 from app.tomtom_controller import Tomtom
 
 
@@ -17,7 +17,7 @@ def main():
     if not jellyfish(parameters):
         return False
 
-    if not bulk_fasta_to_online(parameters):
+    if not bulk_fasta_to_oneline(parameters):
         return False
 
     kc = kmer.KmerCounter(parameters)

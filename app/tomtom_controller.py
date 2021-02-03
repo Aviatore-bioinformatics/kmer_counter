@@ -23,11 +23,13 @@ class Tomtom:
     def kmers_to_meme(self):
         """Converts kmer sequences into MEME format and saves them to the 'kmers.meme' file"""
 
-        if os.path.exists(self.output_meme_file_path) and self.parameters['keep_kmers_meme'] == 'no':
-            print_info(f"The file 'kmers.meme' exists. Removing ... ")
-            os.remove(self.output_meme_file_path)
-        else:
-            print_info("Keeping 'kmers.meme' file generated in the previous run.")
+        if os.path.exists(self.output_meme_file_path):
+            if self.parameters['keep_kmers_meme'] == 'no':
+                print_info(f"The file 'kmers.meme' exists. Removing ... ")
+                os.remove(self.output_meme_file_path)
+            else:
+                print_info("Keeping 'kmers.meme' file generated in the previous run.")
+                return
 
         print_info(f"Converting kmers into MEME format ... ")
 
@@ -48,7 +50,7 @@ class Tomtom:
         parameters = ['tomtom']
 
         # parameters.append('-min-overlap')
-        parameters.append('-min-overlaps')
+        parameters.append('-min-overlap')
         parameters.append(self.parameters['min_overlap'])
 
         if self.parameters['internal'] == 'yes':
@@ -59,6 +61,9 @@ class Tomtom:
 
         parameters.append('-thresh')
         parameters.append(self.parameters['threshold_value'])
+
+        parameters.append('-oc')
+        parameters.append(os.path.join(self.parameters['output_dir'], 'tomtom', 'tomtom_out'))
 
         parameters.append(self.output_meme_file_path)
         parameters.append(self.parameters['motif_database'])
@@ -87,6 +92,8 @@ class Tomtom:
         else:
             print_warning("Something went wrong with tomtom run. Used command:")
             print(" ".join(parameters))
+
+        print(" ".join(parameters))
 
 
 

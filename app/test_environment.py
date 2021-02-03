@@ -1,7 +1,7 @@
 from shutil import which
 import os
 import pkg_resources
-from app.text_formating import red, green
+from app.text_formating import red, green, print_logo
 
 JELLYFISH_OUT_DIR = 'jellyfish'
 
@@ -65,7 +65,7 @@ def pip_check():
     output = True
     installed = {pkg.key for pkg in pkg_resources.working_set}
 
-    print("Checking required python packages ...")
+    print("Checking required Python packages ...")
 
     for package in PIP_REQUIREMENTS:
         print(f'- {package} ... ', end='', flush=True)
@@ -81,6 +81,7 @@ def pip_check():
 
 
 def test():
+    print_logo("Checking environment")
     pip_output = pip_check()
     soft_output = soft_check()
 
