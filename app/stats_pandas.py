@@ -3,12 +3,14 @@ import scipy.stats as stats
 import pandas as pd
 from statsmodels.sandbox.stats.multicomp import multipletests
 from app.text_formating import red, green, print_info, print_warning, print_logo
+import datetime
 # EXAMPLE: multipletests([0.01, 0.02, 0.03], method='bonferroni')
 # RETURNS: (array([ True, False, False]), array([0.03, 0.06, 0.09]), 0.016952427508441503, 0.016666666666666666)
 
 
 class Stat:
     def __init__(self, parameters):
+        datetime.datetime.now()
         self.parameters = parameters
         self.BONFERRONI_OUT_INDEX = 1
         self.chrom_len = {}
@@ -121,8 +123,10 @@ class Stat:
 
     def analyse(self):
         with open(self.merged_table_path, 'r') as f:
+            number_of_lines = self.get_number_of_lines(self.merged_table_path)
+
             for line_numer, line in enumerate(f):
-                self.progress_bar(line_numer + 1, self.get_number_of_lines(self.merged_table_path))
+                self.progress_bar(line_numer + 1, number_of_lines)
 
                 line = line.rstrip()
 
