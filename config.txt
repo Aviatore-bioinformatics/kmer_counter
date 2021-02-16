@@ -37,8 +37,8 @@ bed_file=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/test_mit
 
 
 # TOMTOM PARAMETERS
-# Write 'yes' to keep the 'kmers.meme' file created in the previous run, accepted values: ['yes', 'no']
-keep_kmers_meme=yes
+# Write 'yes' to run tomtom: ['yes', 'no']
+run_tomtom=no
 # motif database file path (MEME format)
 motif_database=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/motif_db/JASPAR_plants.meme
 # Type of significance threshold, accepted values: ['e-value', 'q-value']

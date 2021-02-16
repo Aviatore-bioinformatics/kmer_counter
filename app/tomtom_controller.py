@@ -15,6 +15,11 @@ class Tomtom:
 
     def run(self):
         print_logo("K-mer comparing")
+
+        if self.parameters['run_tomtom'] == 'no':
+            print_info("Analysis canceled. To run tomtom set 'run_tomtom' parameter to 'yes'")
+            return True
+
         self.kmers_to_meme()
         self.tomtom()
 
@@ -24,12 +29,7 @@ class Tomtom:
         """Converts kmer sequences into MEME format and saves them to the 'kmers.meme' file"""
 
         if os.path.exists(self.output_meme_file_path):
-            if self.parameters['keep_kmers_meme'] == 'no':
-                print_info(f"The file 'kmers.meme' exists. Removing ... ")
-                os.remove(self.output_meme_file_path)
-            else:
-                print_info("Keeping 'kmers.meme' file generated in the previous run.")
-                return
+            os.remove(self.output_meme_file_path)
 
         print_info(f"Converting kmers into MEME format ... ")
 
