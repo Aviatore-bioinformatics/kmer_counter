@@ -12,6 +12,10 @@ class TableMerger:
 
     def run(self):
         print_logo("Merging tables")
+
+        if not self.check_run():
+            return True
+
         try:
             if self.merge_tables():
                 self.write_merged_tables()
@@ -71,3 +75,13 @@ class TableMerger:
 
             for kmer in sorted(self.merged_data.keys()):
                 f.write(kmer + "\t" + "\t".join(list(map(str, self.merged_data[kmer]))) + "\n")
+
+    def check_run(self):
+        if not os.path.exists(os.path.join(self.parameters['output_dir'], 'tables', 'table_merged.txt')):
+            return True
+
+        if self.parameters['keep_kmers_merged_table'] == 'yes':
+            print_info("Keeping merged table from the previous run")
+            return False
+
+        return True
