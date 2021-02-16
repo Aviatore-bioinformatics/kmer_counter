@@ -1,18 +1,17 @@
 from app.test_environment import read_config, test
-from app.jellyfish_controller import jellyfish
-from app.utils import fasta_to_oneline
-import app.kmer_counter as kmer
-from app.tables_merger import TableMerger
-from app.stats_pandas import Stat
-from app.fasta_to_oneline_controller import bulk_fasta_to_oneline
-from app.tomtom_controller import Tomtom
-
 
 def main():
     parameters = read_config('config.txt')
 
     if not test():
         return False
+
+    from app.jellyfish_controller import jellyfish
+    import app.kmer_counter as kmer
+    from app.tables_merger import TableMerger
+    from app.stats_pandas import Stat
+    from app.fasta_to_oneline_controller import bulk_fasta_to_oneline
+    from app.tomtom_controller import Tomtom
 
     if not jellyfish(parameters):
         return False
