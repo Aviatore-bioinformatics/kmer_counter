@@ -36,6 +36,10 @@ class Timer:
 
 class KmerCounter:
     def __init__(self, parameters):
+        self.INTERVAL_FROM = 0
+        self.INTERVAL_TO = 1
+        self.INTERVAL_MITE_NAME = 2
+
         self.parameters = parameters
 
         if not os.path.exists(os.path.join(parameters['output_dir'], 'tables')):
@@ -191,8 +195,9 @@ class KmerCounter:
                         if (kmer_occurence) >= (result_parsed.begin - 1) and \
                             (kmer_occurence + int(self.parameters['kmer_length'])) <= result_parsed.end:
                             output_data[result_parsed.data] += 1
-                            kmer_coords[kmer].append(data_input["chr_name"] + ":" + "-".join(
-                                [str(result_parsed_list[0]), str(result_parsed_list[1])]))
+                            kmer_coords[kmer].append("\t".join([data_input["chr_name"], str(result_parsed_list[self.INTERVAL_FROM]), str(result_parsed_list[self.INTERVAL_TO]), f"{kmer};{result_parsed_list[self.INTERVAL_MITE_NAME]}"]))
+                            # kmer_coords[kmer].append(data_input["chr_name"] + ":" + "-".join(
+                            #     [str(result_parsed_list[0]), str(result_parsed_list[1])]))
                         else:
                             output_data["edge"] += 1
                             output_data[result_parsed.data + "_edge"] += 1
@@ -217,8 +222,8 @@ class KmerCounter:
         with open(os.path.join(self.parameters['output_dir'], 'tables', f"table_{prefix}_coords.txt"), 'w') as file:
             for key in kmer_coords.keys():
                 if len(kmer_coords[key]) > 0:
-                    file.write(key + "\n")
-                    file.write("\n".join(kmer_coords[key]) + "\n\n")
+                    # file.write(key + "\n")
+                    file.write("\n".join(kmer_coords[key]) + "\n")
 
     def run(self):
         print_logo("K-mer counting")
