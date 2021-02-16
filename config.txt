@@ -25,8 +25,8 @@ kmer_thresh_max=
 # k-mers with boniferroni-corrected p-value less than the threshold will be selected for further analysis
 p_corrected_bon_thresh=1
 
-# Write 'yes' to remove 'stats.txt' file
-remove_stats_file=yes
+# Write 'yes' to keep the 'stats.txt' file containing results of statistic analysis, accepted values: ['yes', 'no']
+keep_stats_file=yes
 
 # Normalization value used for preventing too small values during normalization of k-mer contribution
 # in genome

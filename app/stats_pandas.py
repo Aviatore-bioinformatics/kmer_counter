@@ -26,15 +26,6 @@ class Stat:
         if not os.path.exists(os.path.join(parameters['output_dir'], 'stats')):
             os.mkdir(os.path.join(parameters['output_dir'], 'stats'))
 
-            if not os.path.exists(os.path.join(parameters['output_dir'], 'stats')):
-                print(f"{red('Warning')} - could not create directory {os.path.join(parameters['output_dir'], 'stats')}")
-                return
-
-        if os.path.exists(os.path.join(parameters['output_dir'], 'stats', 'stats.txt')) and self.parameters['remove_stats_file'] == 'yes':
-            print(f"Output 'stats.txt' file exists. Removing ... ", end='')
-            os.remove(os.path.join(parameters['output_dir'], 'stats', 'stats.txt'))
-            print(green('ok'))
-
     def progress_bar(self, current_value, final_value):
         offset = 100
         diff = (current_value / final_value) * 100
@@ -49,7 +40,8 @@ class Stat:
             print_warning("the merged table does not exist")
             return False
 
-        if not os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')):
+        if not os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')) \
+                or (os.path.exists(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')) and self.parameters['keep_stats_file'] == 'no'):
             try:
                 print_info("Applying Fisher test ...")
                 self.chrom_len_calc()
@@ -178,6 +170,7 @@ class Stat:
                                         name=kmerName, index=self.column_names)
                         self.data = self.data.append(row)
 
+        print("")
         corrected_p = multipletests(list(self.data['fisher_exac_p']), method='bonferroni')[self.BONFERRONI_OUT_INDEX]
 
         self.data['p_corrected_bon'] = corrected_p
@@ -233,5 +226,5 @@ class Stat:
                         output.write(line)
 
     def save_stats_to_file(self, filename):
-        print(f"\nSaving data to file 'stats.txt'")
+        print_info(f"Saving data to file '{os.path.basename(filename)}'")
         self.data.to_csv(filename, sep='\t')
