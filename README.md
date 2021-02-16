@@ -1,3 +1,4 @@
+# K-mer counter
 # Environment preparation
 ## Install miniconda
 ```
