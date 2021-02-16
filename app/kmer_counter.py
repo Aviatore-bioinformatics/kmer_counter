@@ -225,8 +225,23 @@ class KmerCounter:
                     # file.write(key + "\n")
                     file.write("\n".join(kmer_coords[key]) + "\n")
 
+    def check_run(self):
+        for prefix in self.parameters['prefixes']:
+            if not os.path.exists(os.path.join(self.parameters['output_dir'], 'tables', f'table_{prefix}')):
+                return True
+
+        if self.parameters['keep_kmers_table'] == 'yes':
+            print_info("Keeping k-mer counting from the previous run")
+            return False
+
+        return True
+
     def run(self):
         print_logo("K-mer counting")
+
+        if not self.check_run():
+            return True
+
         try:
             with Pool(int(self.parameters['threads_number'])) as pool:
                 pool.map(self.worker, self.data_inputs)
