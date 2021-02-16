@@ -55,6 +55,8 @@ class Stat:
                 self.chrom_len_calc()
                 self.mite_total_len_calc()
                 self.analyse()
+
+                self.save_stats_to_file(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'))
             except Exception:
                 return False
         else:
@@ -65,10 +67,13 @@ class Stat:
             print("")
             print_info(f"Filter statistics data:")
             self.filter_kmers_by_p_corrected_bon_thresh()
-            self.filter_kmers_by_freq_higher()
-            self.filter_kmers_by_freq_lesser()
+            self.save_stats_to_file(os.path.join(self.parameters['output_dir'], 'stats', 'stats_filtered_1_corr_bonif_thresh.txt'))
 
-            self.save_stats_to_file()
+            self.filter_kmers_by_freq_higher()
+            self.save_stats_to_file(os.path.join(self.parameters['output_dir'], 'stats', 'stats_filtered_2_by_freq_higher.txt'))
+
+            self.filter_kmers_by_freq_lesser()
+            self.save_stats_to_file(os.path.join(self.parameters['output_dir'], 'stats', 'stats_filtered_3_by_freq_lesser.txt'))
 
             return True
         except Exception as e:
@@ -134,6 +139,7 @@ class Stat:
                 kmers_out_mites_normalized = []
                 kmers_in_mites_total_sum = 0
                 mite_total_len_int = 0
+
                 line_spliced = line.split('\t')
 
                 if line_spliced[0] == "k-mer":
@@ -204,6 +210,6 @@ class Stat:
 
         return self.data
 
-    def save_stats_to_file(self):
+    def save_stats_to_file(self, filename):
         print(f"\nSaving data to file 'stats.txt'")
-        self.data.to_csv(os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt'), sep='\t')
+        self.data.to_csv(filename, sep='\t')
