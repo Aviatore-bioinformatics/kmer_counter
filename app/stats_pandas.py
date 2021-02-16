@@ -75,6 +75,9 @@ class Stat:
             self.filter_kmers_by_freq_lesser()
             self.save_stats_to_file(os.path.join(self.parameters['output_dir'], 'stats', 'stats_filtered_3_by_freq_lesser.txt'))
 
+            self.merge_coords_files()
+            self.filter_coords_file()
+
             return True
         except Exception as e:
             print(f"Exception: {e}")
@@ -209,6 +212,25 @@ class Stat:
         self.filter_kmers_by_freq_lesser()
 
         return self.data
+
+    def merge_coords_files(self):
+        with open(os.path.join(self.parameters['output_dir'], 'tables', 'table_coords_merged.txt'), 'w') as output:
+            for prefix in self.parameters['prefixes']:
+                with open(os.path.join(self.parameters['output_dir'], 'tables', f'table_{prefix}_coords.txt'), 'r') as file:
+                    for line in file:
+                        output.write(line)
+
+    def filter_coords_file(self):
+        kmers = dict.fromkeys(list(self.data.index), 0)
+
+        with open(os.path.join(self.parameters['output_dir'], 'tables', 'table_coords_merged_filtered.txt'), 'w') as output:
+            with open(os.path.join(self.parameters['output_dir'], 'tables', 'table_coords_merged.txt'), 'r') as file:
+                for line in file:
+                    line_splitted = line.rstrip().split("\t")
+                    kmer = line_splitted[3].split(";")[0]
+
+                    if kmer in kmers:
+                        output.write(line)
 
     def save_stats_to_file(self, filename):
         print(f"\nSaving data to file 'stats.txt'")
