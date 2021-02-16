@@ -87,21 +87,6 @@ class Stat:
                 self.chrom_len[prefix] = line_len
                 self.total_genome_len += line_len
 
-# chrom_len = {
-#     "chr1": 51465340,
-#     "chr2": 43913520,
-#     "chr3": 50312079,
-#     "chr4": 35924511,
-#     "chr5": 41956025,
-#     "chr6": 36610139,
-#     "chr7": 36358036,
-#     "chr8": 31745509,
-#     "chr9": 33682890,
-# }
-# total_genome_len = 361968049
-# normalization_size = 10000
-# mite_total_len = {}
-
     def mite_total_len_calc(self):
         with open(self.parameters['bed_file'], 'r') as f:
             for line in f:
@@ -151,10 +136,6 @@ class Stat:
                             mite_total_len_int += self.mite_total_len[self.mite_names[i]]
 
                     if mite_total_len_int > 0:
-
-                        # kmers_in_mites_total_norm = (kmers_in_mites_total_sum / mite_total_len_int) * self.parameters['normalization_size']
-                        # kmers_out_mites_total_norm = ((kmerTotalOccurences - kmers_in_mites_total_sum) /
-                        #     (self.total_genome_len - mite_total_len_int)) * self.parameters['normalization_size']
                         a = round( (mite_total_len_int / self.total_genome_len) * kmerTotalOccurences )
                         b = round( ((self.total_genome_len - mite_total_len_int) / self.total_genome_len) * kmerTotalOccurences )
 

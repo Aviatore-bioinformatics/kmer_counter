@@ -1,4 +1,4 @@
-# jellyfish parameters
+# JELLYFISH PARAMETERS
 kmer_length=10
 hash_size=100M
 threads_number=2
@@ -12,39 +12,34 @@ data_dir=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data
 
 # K-MER COUNTER PARAMETERS
 # Write 'yes' to keep the 'table' files with k-mer counting results, accepted values: ['yes', 'no']
-keep_kmers_table=no
+keep_kmers_table=yes
 # Write 'yes' to keep the 'table_merged.txt' file containing merged data of k-mer counting results from all chromosomes, accepted values: ['yes', 'no']
 keep_kmers_merged_table=yes
 
 # STATISTICS PARAMETERS
 # k-mer frequency threshold
-# k-mers which frequency in MITEs is higher than the threshold will be considered for analysis
+# k-mers which frequency in MITEs is higher than the threshold will be considered for analysis, accepted values: unsigned integer
 kmer_thresh_min=
 kmer_thresh_max=
 
 # k-mers with boniferroni-corrected p-value less than the threshold will be selected for further analysis
-p_corrected_bon_thresh=1
+p_corrected_bon_thresh=0.05
 
 # Write 'yes' to keep the 'stats.txt' file containing results of statistic analysis, accepted values: ['yes', 'no']
 keep_stats_file=yes
 
-# Normalization value used for preventing too small values during normalization of k-mer contribution
-# in genome
-normalization_size=10000
-
 # Path to *.bed file
 bed_file=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/test_mites.bed
 
-
 # TOMTOM PARAMETERS
 # Write 'yes' to run tomtom: ['yes', 'no']
-run_tomtom=no
+run_tomtom=yes
 # motif database file path (MEME format)
 motif_database=/media/veracrypt1/Dysk/2020/Projektt_Ali_MP/final_version/data/motif_db/JASPAR_plants.meme
 # Type of significance threshold, accepted values: ['e-value', 'q-value']
 threshold_type=q-value
 # Threshold value, accepted values: float number between 0 and 1
-threshold_value=0.5
+threshold_value=0.05
 # This parameter forces the shorter motif to be completely contained in the longer motif, accepted values: ['yes', 'no']
 internal=no
 # Only report motif matches that overlap by min overlap positions or more. In case a query motif is smaller than min overlap, then the motif's width is used as the minimum overlap for that query
