@@ -6,7 +6,15 @@ from app.text_formating import red, green, print_info, print_warning, print_logo
 class Tomtom:
     def __init__(self, parameters):
         self.parameters = parameters
-        self.stats_file_path = os.path.join(self.parameters['output_dir'], 'stats', 'stats.txt')
+        self.input_file_types = {
+            '1': 'stats.txt',
+            '2': 'stats_filtered_1_corr_bonif_thresh.txt',
+            '3': 'stats_filtered_2_by_freq_higher.txt',
+            '4': 'stats_filtered_3_by_freq_lesser.txt'
+        }
+
+        input_file = self.input_file_types[self.parameters['tomtom_input_file_type']]
+        self.stats_file_path = os.path.join(self.parameters['output_dir'], 'stats', input_file)
 
         if not os.path.exists(os.path.join(self.parameters['output_dir'], 'tomtom')):
             os.mkdir(os.path.join(self.parameters['output_dir'], 'tomtom'))

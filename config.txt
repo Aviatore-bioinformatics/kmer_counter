@@ -44,3 +44,12 @@ threshold_value=0.05
 internal=no
 # Only report motif matches that overlap by min overlap positions or more. In case a query motif is smaller than min overlap, then the motif's width is used as the minimum overlap for that query
 min_overlap=1
+
+# Select the type of the input file for TOMTOM (by choosing the corresponding number)
+# 1 - 'stats.txt' - raw statistics data
+# 2 - 'stats_filtered_1_corr_bonif_thresh.txt' - statistics data filtered by the Boniferoni threshold
+# 3 - 'stats_filtered_2_by_freq_higher.txt' - statistics from 'stats_filtered_1_corr_bonif_thresh.txt' that meet the below criteria
+# freq > (mite_total_len / total_genome_len) * kmer_thresh_min
+# 4 - 'stats_filtered_3_by_freq_lesser.txt' - statistics from 'stats_filtered_2_by_freq_higher.txt' that meet the below criteria
+# freq < (mite_total_len / total_genome_len) * kmer_thresh_max
+tomtom_input_file_type=4
